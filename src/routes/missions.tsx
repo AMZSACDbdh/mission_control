@@ -1,6 +1,7 @@
 import { useState, useEffect, type ReactNode } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
+  AlertTriangle,
   Sun,
   CloudSun,
   Search,
@@ -58,6 +59,7 @@ function MissionsPage() {
 
   // Database state
   const [missions, setMissions] = useState<Mission[]>(initialMissions);
+  const [writeError, setWriteError] = useState<string | null>(null);
 
   // Filter & View State
   const [activeView, setActiveView] = useState<"board" | "list" | "calendar">("board");
@@ -97,7 +99,11 @@ function MissionsPage() {
   }, []);
 
   useEffect(() => {
-    if (isMounted) void writeJson(KEYS.missions, missions);
+    if (!isMounted) return;
+    void (async () => {
+      const result = await writeJson(KEYS.missions, missions);
+      setWriteError(result.ok ? null : result.message);
+    })();
   }, [missions, isMounted]);
 
   /**
@@ -306,6 +312,15 @@ function MissionsPage() {
 
   return (
     <div className="select-none animate-rise min-h-screen bg-[#F2ECE1] text-[#2D241B] p-4 md:p-6 lg:p-8 rounded-3xl relative overflow-hidden font-sans border border-[#D9CDBA]">
+      {writeError && (
+        <div
+          role="alert"
+          className="mb-4 flex items-start gap-3 rounded-xl border border-rose-800/60 bg-rose-950/25 p-3"
+        >
+          <AlertTriangle className="mt-0.5 size-4 shrink-0 text-rose-400" aria-hidden />
+          <p className="text-sm text-rose-200">Mission data is not being saved — {writeError}</p>
+        </div>
+      )}
       {/* 1. TOP HEADER BAR */}
       <header className="flex flex-col justify-between gap-4 md:flex-row md:items-center pb-5 border-b border-[#D9CDBA]/60">
         <div className="space-y-1">

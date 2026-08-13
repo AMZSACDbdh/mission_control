@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
+  AlertTriangle,
   Clock,
-  CloudSun,
   ChevronLeft,
   ChevronRight,
   Sparkles,
@@ -14,17 +14,11 @@ import {
   Notebook,
 } from "lucide-react";
 
-import { useCountUp } from "@/hooks/use-count-up";
 import { KEYS, readJson, writeJson } from "@/services/store";
 import { dayKeyFor, XP } from "@/data/activity";
-import {
-  DEFAULT_ENTRY,
-  emptyEntry,
-  hasWritten,
-  journalRef,
-  type JournalData,
-} from "@/data/journal";
+import { emptyEntry, hasWritten, journalRef, type JournalData } from "@/data/journal";
 import { useActivity } from "@/hooks/use-activity";
+import { useWeather } from "@/hooks/use-weather";
 
 const title = "Journal — Mission Control";
 const description = "A space for reflection. A path to clarity.";
@@ -71,6 +65,7 @@ function JournalPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [time, setTime] = useState(new Date());
   const { toggle } = useActivity();
+  const weather = useWeather();
 
   // Date selection state — must use dayKeyFor so it matches the activity system's
   // 04:00 UTC day boundary, not the raw UTC calendar date.
@@ -78,6 +73,7 @@ function JournalPage() {
 
   // Main entries database
   const [journalDatabase, setJournalDatabase] = useState<Record<string, JournalData>>({});
+  const [writeError, setWriteError] = useState<string | null>(null);
 
   // Sync timing ticking
   useEffect(() => {
@@ -90,7 +86,11 @@ function JournalPage() {
   }, []);
 
   useEffect(() => {
-    if (isMounted) void writeJson(KEYS.journal, journalDatabase);
+    if (!isMounted) return;
+    void (async () => {
+      const result = await writeJson(KEYS.journal, journalDatabase);
+      setWriteError(result.ok ? null : result.message);
+    })();
   }, [journalDatabase, isMounted]);
 
   // Retrieve data for selected date
@@ -202,6 +202,17 @@ function JournalPage() {
 
   return (
     <div className="space-y-6 select-none animate-rise min-h-screen text-xs text-foreground/90 relative pb-12">
+      {writeError && (
+        <div
+          role="alert"
+          className="flex items-start gap-3 rounded-xl border border-rose-800/60 bg-rose-950/25 p-4"
+        >
+          <AlertTriangle className="mt-0.5 size-4 shrink-0 text-rose-400" aria-hidden />
+          <p className="text-sm text-rose-200">
+            Journal entries are not being saved — {writeError}
+          </p>
+        </div>
+      )}
       {/* Background Subtle Ink Mountains overlay at bottom-left */}
       <svg
         className="absolute bottom-0 left-0 w-full max-w-[360px] h-[150px] opacity-10 pointer-events-none text-gold-dim/40 z-0"
@@ -261,20 +272,33 @@ function JournalPage() {
             <Clock className="size-4 text-gold-soft animate-pulse" />
             <div className="text-right">
               <p className="text-sm font-semibold tracking-wider leading-none">
-                {isMounted ? displayTime : "9:45 PM"}
+                {isMounted ? displayTime : ""}
               </p>
               <p className="text-[0.6rem] text-muted-foreground mt-0.5 whitespace-nowrap">
-                {isMounted ? displayDateStr : "May 17, 2025"}
+                {isMounted ? displayDateStr : ""}
               </p>
             </div>
-            <div className="h-5 w-px bg-border/40" />
-            <CloudSun className="size-4 text-gold-dim" />
-            <div className="text-left">
-              <p className="text-sm font-semibold leading-none">23°C</p>
-              <p className="text-[0.6rem] text-muted-foreground mt-0.5 whitespace-nowrap">
-                Kyoto, JP
-              </p>
-            </div>
+            {weather.status !== "error" && (
+              <>
+                <div className="h-5 w-px bg-border/40" />
+                {(() => {
+                  const WeatherIcon = weather.icon;
+                  return (
+                    <WeatherIcon
+                      className={`size-4 text-gold-dim ${weather.status === "loading" ? "animate-pulse" : ""}`}
+                    />
+                  );
+                })()}
+                <div className="text-left">
+                  <p className="text-sm font-semibold leading-none">
+                    {weather.temperatureC === null ? "—" : `${weather.temperatureC}°C`}
+                  </p>
+                  <p className="text-[0.6rem] text-muted-foreground mt-0.5 whitespace-nowrap">
+                    {weather.status === "loading" ? "Reading the sky" : weather.city}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </header>

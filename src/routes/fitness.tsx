@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, Moon, Timer } from "lucide-react";
+import { AlertTriangle, Check, Moon, Timer } from "lucide-react";
 
 import { EnsoRing } from "@/components/mission/EnsoRing";
 import { InkArt } from "@/components/mission/InkArt";
@@ -104,6 +104,7 @@ function FitnessPage() {
   const [exercises, setExercises] = useState<Exercise[]>(defaultExercises);
   const [session, setSession] = useState<SessionCursor | null>(null);
   const [hydrated, setHydrated] = useState(false);
+  const [writeError, setWriteError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -120,7 +121,10 @@ function FitnessPage() {
 
   useEffect(() => {
     if (!hydrated) return;
-    void writeJson(KEYS.fitness, { exercises, session } satisfies FitnessStore);
+    void (async () => {
+      const result = await writeJson(KEYS.fitness, { exercises, session } satisfies FitnessStore);
+      setWriteError(result.ok ? null : result.message);
+    })();
   }, [exercises, session, hydrated]);
 
   // A cursor from an earlier day is not today's session — the day starts empty.
@@ -214,9 +218,20 @@ function FitnessPage() {
   const volumeByWeek = today ? sessionsByWeek(events, today, 6) : [];
   const maxVolume = Math.max(1, ...volumeByWeek.map((v) => v.value));
 
+  const todayFocus = todayIndex >= 0 ? weekSplit[todayIndex]?.focus : null;
+
   return (
     <div className="animate-rise space-y-6 select-none">
       <PageHeader title="Fitness" seal="鍛錬" subtitle={description} motif="pine" />
+      {writeError && (
+        <div
+          role="alert"
+          className="flex items-start gap-3 rounded-xl border border-rose-800/60 bg-rose-950/25 p-4"
+        >
+          <AlertTriangle className="mt-0.5 size-4 shrink-0 text-rose-400" aria-hidden />
+          <p className="text-sm text-rose-200">Training data is not being saved — {writeError}</p>
+        </div>
+      )}
 
       <section
         aria-label="Training statistics"
@@ -264,7 +279,7 @@ function FitnessPage() {
         {/* Today's session */}
         <Panel as="section" className="p-6">
           <div className="mb-5 flex items-center justify-between border-b border-border/40 pb-3">
-            <PanelLabel className="mb-0">Today — Lower Body Strength</PanelLabel>
+            <PanelLabel className="mb-0">Today{todayFocus ? ` — ${todayFocus}` : ""}</PanelLabel>
             <span className="text-[0.6rem] tracking-[0.14em] text-muted-foreground uppercase">
               {doneCount} / {exercises.length} done
             </span>

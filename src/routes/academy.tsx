@@ -343,6 +343,13 @@ function AcademyPage() {
   // Get active selected book details
   const activeBook = books.find((b) => b.id === selectedBookId) ?? books[0] ?? null;
 
+  /** Days remaining until a given date string ("YYYY-MM-DD"), computed from the live clock. */
+  const daysUntil = (dateStr: string): number => {
+    const target = new Date(dateStr);
+    const today = new Date(time.getFullYear(), time.getMonth(), time.getDate());
+    return Math.ceil((target.getTime() - today.getTime()) / 86_400_000);
+  };
+
   // Indexing an array yields `T | undefined` under this tsconfig, so the quote
   // is resolved once with a fallback rather than asserted at each use.
   const activeQuote = INSPIRATIONAL_QUOTES[quoteIndex] ?? INSPIRATIONAL_QUOTES[0]!;
@@ -1087,7 +1094,10 @@ function AcademyPage() {
                       <p className="text-[0.6rem] text-muted-foreground mt-0.5">{exam.subject}</p>
                     </div>
                     <span className="text-[0.62rem] font-bold text-red-400 font-display">
-                      in {exam.daysRemaining} days
+                      {(() => {
+                        const d = daysUntil(exam.date);
+                        return d > 0 ? `in ${d} days` : d === 0 ? "today" : "past";
+                      })()}
                     </span>
                   </div>
 
