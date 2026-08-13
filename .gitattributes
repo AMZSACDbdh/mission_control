@@ -1,0 +1,16 @@
+# Normalize all text files to LF in the repo and on checkout.
+# This overrides core.autocrlf=true on Windows runners so Prettier
+# (which defaults to endOfLine: "lf") never sees stray CR characters.
+* text=auto eol=lf
+
+# Treat binaries as binary — no EOL conversion.
+*.ico binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.eot binary
