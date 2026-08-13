@@ -1,17 +1,28 @@
 import type { Platform, PlatformCapabilities } from "../types";
 import { createTauriStorage } from "./storage";
+import { createTauriStartup } from "./startup";
 import { createWebNotifications } from "../web/notifications";
 import { createWebGeolocation } from "../web/geolocation";
 import { createWebPresence } from "../web/presence";
 import { createWebFiles } from "../web/files";
 
 /**
- * Tauri platform capabilities for Phase 1 (foundation only).
+ * Tauri platform capabilities.
  *
- * storageIsQuotaLimited is the one flag that flips immediately — the store
- * writes to a real file on disk, so the 5 MB localStorage cliff is gone.
- * All other desktop-only capabilities (autostart, tray, global shortcuts)
- * are left false until their respective phases are implemented.
+ * storageIsQuotaLimited was the first to flip — the store writes to a real file
+ * on disk, so the 5 MB localStorage cliff is gone.
+ *
+ * canAutostart is now true: the app registers itself under the per-user Run key.
+ * Note what that flag does *not* claim. The Run key fires at sign-in and only at
+ * sign-in. It does not fire on resume from sleep — and it does not need to,
+ * because sleep never ended the process; the app the user left open is the app
+ * they come back to. Relaunching on wake would mean a Task Scheduler trigger on
+ * the power event, which needs elevation to register and would then race the
+ * single-instance mutex on every lid-open. The honest mechanism is the one that
+ * matches the promise, so this stays at sign-in.
+ *
+ * Tray, global shortcuts and background scheduling remain false until they are
+ * actually built.
  */
 const tauriCapabilities: PlatformCapabilities = {
   name: "tauri",
@@ -19,7 +30,7 @@ const tauriCapabilities: PlatformCapabilities = {
   canNotifyInBackground: false,
   canBlockDistractions: false,
   canObserveSystemPresence: false,
-  canAutostart: false,
+  canAutostart: true,
   canRunInBackground: false,
   canUseSystemTray: false,
   canScheduleInBackground: false,
@@ -36,5 +47,6 @@ export function createTauriPlatform(): Platform {
     geolocation: createWebGeolocation(),
     presence: createWebPresence(),
     files: createWebFiles(),
+    startup: createTauriStartup(),
   };
 }

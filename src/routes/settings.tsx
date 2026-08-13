@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, Download, Upload } from "lucide-react";
+import { AlertTriangle, Download, Power, Upload } from "lucide-react";
 
 import { PageHeader } from "@/components/mission/PageHeader";
 import { Panel, PanelLabel } from "@/components/mission/Panel";
@@ -17,6 +17,7 @@ import {
   RATE_VERSION,
   TASK_POT,
 } from "@/data/activity";
+import { platform } from "@/platform";
 import { downloadBackup, restoreBackup } from "@/lib/backup";
 import { getApiKey, setApiKey } from "@/lib/youtube";
 import { DEFAULT_NAME } from "@/lib/profile";
@@ -59,6 +60,32 @@ function SettingsPage() {
     const result = await restoreBackup(text, events);
     if (result.mergedEvents) replaceAll(result.mergedEvents);
     setNotice({ ok: result.ok, message: result.message });
+  };
+
+  // Only ever true on the desktop build; the whole panel is absent on the web.
+  const canAutostart = platform.capabilities.canAutostart;
+  const [startupOn, setStartupOn] = useState(false);
+  const [startupError, setStartupError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!canAutostart) return;
+    void platform.startup.isEnabled().then(setStartupOn);
+  }, [canAutostart]);
+
+  /**
+   * Reflects what Windows actually holds afterwards, not what was asked for.
+   * If the registry write is refused the toggle snaps back rather than showing
+   * an "on" the machine never agreed to.
+   */
+  const toggleStartup = async () => {
+    const wanted = !startupOn;
+    const actual = await platform.startup.setEnabled(wanted);
+    setStartupOn(actual);
+    setStartupError(
+      actual === wanted
+        ? null
+        : "Windows would not change this setting. You can set it manually in Task Manager under Startup apps.",
+    );
   };
 
   // An export that throws must not fail silently — this is the button the
@@ -196,6 +223,50 @@ function SettingsPage() {
           or removed from this browser automatically.
         </p>
       </Panel>
+
+      {/* Startup — desktop only; the web build has no such capability. */}
+      {canAutostart && (
+        <Panel as="section" className="p-6">
+          <PanelLabel>Startup</PanelLabel>
+          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            Open Mission Control automatically when you sign in to Windows. It registers under your
+            own account, so it never asks for administrator rights, and it stays listed in Task
+            Manager under Startup apps if you would rather switch it off from there.
+          </p>
+
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={startupOn}
+              onClick={() => void toggleStartup()}
+              className={
+                startupOn
+                  ? "flex h-10 cursor-pointer items-center gap-2 rounded-full bg-linear-to-r from-gold-dim via-gold to-gold-soft px-6 text-[0.7rem] font-bold tracking-[0.16em] text-primary-foreground uppercase transition-all duration-300 hover:brightness-110"
+                  : "flex h-10 cursor-pointer items-center gap-2 rounded-full border border-border/60 px-6 text-[0.7rem] font-medium tracking-[0.14em] text-muted-foreground uppercase transition-colors duration-300 hover:border-gold/50 hover:text-gold"
+              }
+            >
+              <Power className="size-4" />
+              {startupOn ? "Launching at sign-in" : "Launch at sign-in"}
+            </button>
+          </div>
+
+          {startupError && (
+            <p className="mt-4 flex items-center gap-2 text-sm text-rose-400">
+              <AlertTriangle className="size-4 shrink-0" aria-hidden />
+              {startupError}
+            </p>
+          )}
+
+          <p className="mt-4 border-t border-border/40 pt-4 text-[0.7rem] leading-relaxed text-muted-foreground/80">
+            This starts Mission Control when you sign in, not when the machine wakes from sleep —
+            sleep never closed it, so there is nothing to reopen. Opening it a second time brings
+            the existing window forward rather than running two copies. Your ledger is untouched
+            either way: if a startup launch ever fails, nothing is lost and opening the app by hand
+            still works.
+          </p>
+        </Panel>
+      )}
 
       {/* YouTube key */}
       <Panel as="section" className="p-6">

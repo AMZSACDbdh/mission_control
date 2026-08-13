@@ -88,6 +88,7 @@ import {
 } from "../src/hooks/use-series";
 import { parsePlaylistId } from "../src/lib/youtube";
 import { KEYS, writeJson } from "../src/services/store";
+import { platform } from "../src/platform";
 
 let P = 0;
 let F = 0;
@@ -3963,6 +3964,42 @@ t("importing the same file twice does not double XP", sumXp(twiceOver.mergedEven
 // An empty desktop install importing a browser export: no current events at all.
 const ontoEmpty = await restoreBackup(ledgerFile, []);
 t("restoring onto an empty install keeps the single event", ontoEmpty.mergedEvents?.length === 1);
+
+console.log("\n===== 29. STARTUP REGISTRATION =====");
+// These run against the web platform (no __TAURI_INTERNALS__ in Node), which is
+// exactly the build that must stay inert: adding launch-at-sign-in to the
+// desktop app must not make the browser claim a capability it cannot honour.
+t("the web build is selected in this environment", platform.capabilities.name === "web");
+t("the web build does not claim it can autostart", platform.capabilities.canAutostart === false);
+t("web startup reports itself disabled", (await platform.startup.isEnabled()) === false);
+t("web startup cannot be switched on", (await platform.startup.setEnabled(true)) === false);
+
+// A capability flag that disagrees with its adapter is worse than either alone:
+// the interface would offer a control that silently does nothing.
+t(
+  "capability flag and adapter agree",
+  platform.capabilities.canAutostart === (await platform.startup.isEnabled()) ||
+    platform.capabilities.canAutostart,
+  "canAutostart is false but the adapter reports enabled",
+);
+
+// Startup is a convenience. It must never be able to throw into Settings, and
+// never share a failure path with the ledger.
+let startupThrew = false;
+try {
+  await platform.startup.setEnabled(true);
+  await platform.startup.setEnabled(false);
+} catch {
+  startupThrew = true;
+}
+t("changing startup never throws", startupThrew === false);
+
+const ledgerAfterStartupChurn = await restoreBackup(ledgerFile, []);
+t(
+  "a startup change leaves ledger restore intact",
+  ledgerAfterStartupChurn.ok === true && sumXp(ledgerAfterStartupChurn.mergedEvents ?? []) === 33,
+  "ledger behaviour moved after touching startup",
+);
 
 console.log("\n" + P + " passed, " + F + " failed");
 if (fails.length) {

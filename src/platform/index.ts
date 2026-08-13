@@ -4,6 +4,7 @@ import { createWebNotifications } from "./web/notifications";
 import { createWebGeolocation } from "./web/geolocation";
 import { createWebPresence } from "./web/presence";
 import { createWebFiles } from "./web/files";
+import { createWebStartup } from "./web/startup";
 import { createTauriPlatform } from "./tauri";
 
 export * from "./types";
@@ -63,6 +64,7 @@ function createWebPlatform(): Platform {
     geolocation: createWebGeolocation(),
     presence: createWebPresence(),
     files: createWebFiles(),
+    startup: createWebStartup(),
   };
 }
 

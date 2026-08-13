@@ -119,6 +119,28 @@ export interface FileAdapter {
 }
 
 /* ------------------------------------------------------------------ *
+ * Startup
+ * ------------------------------------------------------------------ */
+
+/**
+ * Registration for launching when the user signs in.
+ *
+ * Both methods report the state actually in effect rather than the state that
+ * was requested, and neither throws. A machine that refuses the registration —
+ * locked-down registry, group policy, a security product — is one where the
+ * toggle should fall back and say so, not one where Settings crashes.
+ *
+ * Launching at startup is a convenience. It must never be able to take the
+ * ledger down with it, so nothing here shares a failure path with storage.
+ */
+export interface StartupAdapter {
+  /** Whether the app is currently registered to launch at sign-in. */
+  isEnabled(): Promise<boolean>;
+  /** Requests a change. Resolves to the state in effect afterwards. */
+  setEnabled(enabled: boolean): Promise<boolean>;
+}
+
+/* ------------------------------------------------------------------ *
  * Capabilities
  * ------------------------------------------------------------------ */
 
@@ -163,4 +185,5 @@ export interface Platform {
   readonly geolocation: GeolocationAdapter;
   readonly presence: PresenceAdapter;
   readonly files: FileAdapter;
+  readonly startup: StartupAdapter;
 }
