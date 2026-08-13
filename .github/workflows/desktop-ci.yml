@@ -49,7 +49,9 @@ jobs:
       - name: Install npm dependencies
         run: npm ci
 
-      - name: Typecheck, lint and 634 tests
+      # Counts drift; naming one here just goes stale. Both suites exit non-zero
+      # on any failing invariant, so a green step is the real assertion.
+      - name: Typecheck, lint and invariant suites
         run: npm run check
 
       # ── Tauri build (slow — Rust compile + NSIS bundle) ───────────────────
