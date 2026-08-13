@@ -37,6 +37,23 @@ const BACKED_UP_KEYS = [
   KEYS.fitness,
 ] as const;
 
+/**
+ * Human names for the stores, used when a restore cannot write one of them.
+ * A user told "could not save: missions, journal" can act; one told
+ * "mission-control-missions-v3" cannot.
+ */
+const SECTION_LABELS: Record<string, string> = {
+  [KEYS.activity]: "ledger",
+  [KEYS.progression]: "progression",
+  [KEYS.dayPlans]: "day plans",
+  [KEYS.series]: "series",
+  [KEYS.favouriteQuotes]: "favourite quotes",
+  [KEYS.missions]: "missions",
+  [KEYS.journal]: "journal",
+  [KEYS.profile]: "profile",
+  [KEYS.fitness]: "training",
+};
+
 export type Backup = {
   format: "mission-control-backup";
   version: 1;
@@ -166,6 +183,7 @@ export async function restoreBackup(
   }
 
   let mergedEvents: ActivityEvent[] | undefined;
+  const failed: string[] = [];
 
   for (const [key, value] of Object.entries(parsed.data ?? {})) {
     if (!(BACKED_UP_KEYS as readonly string[]).includes(key)) continue;
@@ -177,7 +195,31 @@ export async function restoreBackup(
     }
 
     const result = await writeJson(key, value);
-    if (!result.ok) console.error(`Could not restore ${key}: ${result.message}`);
+    if (!result.ok) {
+      console.error(`Could not restore ${key}: ${result.message}`);
+      failed.push(SECTION_LABELS[key] ?? key);
+    }
+  }
+
+  /**
+   * A restore that could not write must never report success.
+   *
+   * This previously logged failures to the console and returned `ok: true`
+   * regardless — the exact silent-write-failure this codebase refuses to accept
+   * everywhere else, and worst of all on the browser-to-desktop migration path,
+   * where the user has every reason to believe their history moved across.
+   *
+   * `mergedEvents` is still returned: the ledger merge happens in memory and is
+   * persisted by the caller through the activity hook, which reports its own
+   * write failures. Re-importing the same file is idempotent, so telling the
+   * user to try again is safe advice.
+   */
+  if (failed.length > 0) {
+    return {
+      ok: false,
+      message: `Restore incomplete — could not save: ${failed.join(", ")}. Nothing was deleted, but those sections are unchanged. Free up space or check permissions, then import the same file again.`,
+      ...(mergedEvents ? { mergedEvents } : {}),
+    };
   }
 
   const added = mergedEvents ? mergedEvents.length - currentEvents.length : 0;

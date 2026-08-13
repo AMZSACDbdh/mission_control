@@ -61,6 +61,20 @@ function SettingsPage() {
     setNotice({ ok: result.ok, message: result.message });
   };
 
+  // An export that throws must not fail silently — this is the button the
+  // storage warning tells people to press before they lose anything.
+  const handleExport = async () => {
+    try {
+      await downloadBackup();
+    } catch (e) {
+      console.error("Could not export a backup", e);
+      setNotice({
+        ok: false,
+        message: "Export failed — the backup file could not be written. Please try again.",
+      });
+    }
+  };
+
   const oldest = events.length > 0 ? [...events].map((e) => e.day).sort()[0] : null;
 
   return (
@@ -136,7 +150,7 @@ function SettingsPage() {
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <button
             type="button"
-            onClick={() => void downloadBackup()}
+            onClick={() => void handleExport()}
             className="flex h-10 cursor-pointer items-center gap-2 rounded-full bg-linear-to-r from-gold-dim via-gold to-gold-soft px-6 text-[0.7rem] font-bold tracking-[0.16em] text-primary-foreground uppercase shadow-[0_0_20px_oklch(0.78_0.11_82/25%)] transition-all duration-300 hover:brightness-110"
           >
             <Download className="size-4" />
@@ -176,7 +190,10 @@ function SettingsPage() {
 
         <p className="mt-4 border-t border-border/40 pt-4 text-[0.7rem] leading-relaxed text-muted-foreground/80">
           Restoring <span className="text-foreground">merges</span> the ledger by event id rather
-          than overwriting it, so importing an old backup can never delete newer work.
+          than overwriting it, so importing an old backup can never delete newer work. Moving to the
+          desktop app? Export here, then import there — everything travels except your YouTube API
+          key, which is deliberately kept out of the file and must be re-entered. Nothing is copied
+          or removed from this browser automatically.
         </p>
       </Panel>
 

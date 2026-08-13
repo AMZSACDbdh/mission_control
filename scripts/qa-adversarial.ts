@@ -57,7 +57,7 @@ import {
   seals as sealDefs,
   type EarnContext,
 } from "../src/data/achievements";
-import { mergeLedgers, dedupeLedger } from "../src/lib/backup";
+import { mergeLedgers, dedupeLedger, restoreBackup } from "../src/lib/backup";
 import {
   isTaskComplete,
   makeSubtasks,
@@ -87,6 +87,7 @@ import {
   type Series,
 } from "../src/hooks/use-series";
 import { parsePlaylistId } from "../src/lib/youtube";
+import { KEYS, writeJson } from "../src/services/store";
 
 let P = 0;
 let F = 0;
@@ -3902,8 +3903,72 @@ t(
   XP.workout === 80 && XP.journal === 30 && XP.discipline === 15,
 );
 
+console.log("\n===== 28. RESTORE / MIGRATION HONESTY =====");
+// This suite runs in Node, where `localStorage` does not exist, so every write
+// through the web adapter fails with reason "unavailable". That makes this the
+// natural place to prove a restore that cannot write says so, instead of
+// reporting "Restored." over a migration that silently did nothing.
+const writeReallyFails = await writeJson(KEYS.missions, []);
+t(
+  "precondition: storage writes genuinely fail in this environment",
+  writeReallyFails.ok === false,
+  "storage was writable, so the failure-surfacing tests below would prove nothing",
+);
+
+const failingFile = JSON.stringify({
+  format: "mission-control-backup",
+  version: 1,
+  exportedAt: "2026-01-01T00:00:00.000Z",
+  data: { [KEYS.missions]: [], [KEYS.journal]: {} },
+});
+const failedRestore = await restoreBackup(failingFile, []);
+t(
+  "a restore whose writes fail is not reported as success",
+  failedRestore.ok === false,
+  "ACTUAL ok=" + failedRestore.ok + " :: " + failedRestore.message,
+);
+t(
+  "the failure names every section that could not be saved",
+  /missions/.test(failedRestore.message) && /journal/.test(failedRestore.message),
+  "ACTUAL " + failedRestore.message,
+);
+
+t("invalid JSON is rejected", (await restoreBackup("{not json", [])).ok === false);
+t(
+  "a file that is not a Mission Control backup is rejected",
+  (await restoreBackup(JSON.stringify({ format: "something-else" }), [])).ok === false,
+);
+
+// A ledger-only backup writes nothing through the failing path, so it must still
+// succeed — and must carry ids and refs across untouched.
+const carried = ev({ ref: "task:carry-me", id: "id-carry", xp: 33, label: "step" });
+const ledgerFile = JSON.stringify({
+  format: "mission-control-backup",
+  version: 1,
+  exportedAt: "2026-01-01T00:00:00.000Z",
+  data: { [KEYS.activity]: [carried] },
+});
+const ledgerRestore = await restoreBackup(ledgerFile, []);
+t("a ledger-only restore succeeds", ledgerRestore.ok === true, ledgerRestore.message);
+t("import preserves the event id", ledgerRestore.mergedEvents?.[0]?.id === "id-carry");
+t("import preserves the event ref", ledgerRestore.mergedEvents?.[0]?.ref === "task:carry-me");
+t("import preserves the event xp", sumXp(ledgerRestore.mergedEvents ?? []) === 33);
+
+// Importing the same file again — the thing a nervous migrating user does — must
+// not duplicate the ledger or double the XP.
+const twiceOver = await restoreBackup(ledgerFile, ledgerRestore.mergedEvents ?? []);
+t("importing the same file twice adds nothing", twiceOver.mergedEvents?.length === 1);
+t("importing the same file twice does not double XP", sumXp(twiceOver.mergedEvents ?? []) === 33);
+
+// An empty desktop install importing a browser export: no current events at all.
+const ontoEmpty = await restoreBackup(ledgerFile, []);
+t("restoring onto an empty install keeps the single event", ontoEmpty.mergedEvents?.length === 1);
+
 console.log("\n" + P + " passed, " + F + " failed");
 if (fails.length) {
   console.log("\nFAILED INVARIANTS:");
   fails.forEach((f) => console.log(" - " + f));
 }
+// Without this the suite always exited 0: a broken invariant printed its failure
+// and the build went green anyway, which made every check above advisory only.
+process.exit(F === 0 ? 0 : 1);
