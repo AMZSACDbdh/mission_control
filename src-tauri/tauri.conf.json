@@ -39,9 +39,7 @@
       "nsis": {
         "installerHooks": "./windows/hooks.nsi",
         "installMode": "currentUser",
-        "startMenuFolder": "Mission Control",
-        "shortcutName": "Mission Control",
-        "createDesktopShortcut": "Always"
+        "startMenuFolder": "Mission Control"
       }
     }
   },
