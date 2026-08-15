@@ -7,7 +7,8 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { Upload, X } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -16,6 +17,8 @@ import { ActivityProvider } from "@/hooks/use-activity";
 import { ProgressionProvider } from "@/hooks/use-progression";
 import { CeremonyOverlay } from "@/components/mission/Ceremony";
 import { StorageAlert } from "@/components/mission/StorageAlert";
+import { isTauri } from "@/platform";
+import { KEYS, readJson, writeJson } from "@/services/store";
 
 function NotFoundComponent() {
   return (
@@ -116,6 +119,61 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
+/**
+ * Shown exactly once, on the first launch of the desktop (Tauri) build, to
+ * tell the user that their web data can be imported from a backup file.
+ *
+ * The welcomed key is written on dismiss (or after a successful import in
+ * Settings), so the banner never appears again. It does not block the app,
+ * and it does not render at all on the web build.
+ */
+function DesktopMigrationBanner() {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (!isTauri()) return;
+    void readJson<boolean>(KEYS.desktopWelcomed, false).then((welcomed) => {
+      if (!welcomed) setShow(true);
+    });
+  }, []);
+
+  const dismiss = () => {
+    setShow(false);
+    void writeJson(KEYS.desktopWelcomed, true);
+  };
+
+  if (!show) return null;
+
+  return (
+    <div
+      role="status"
+      className="mb-6 flex flex-wrap items-start gap-4 rounded-xl border border-gold/40 bg-gold/8 p-4"
+    >
+      <Upload className="mt-0.5 size-5 shrink-0 text-gold" aria-hidden />
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-medium text-foreground">Welcome to the desktop app</p>
+        <p className="mt-1 text-[0.78rem] leading-relaxed text-muted-foreground">
+          If you have been using Mission Control in a browser, go to{" "}
+          <Link to="/settings" className="text-gold underline-offset-2 hover:underline">
+            Settings
+          </Link>{" "}
+          and use <span className="text-foreground">Restore From File</span> to import your backup.
+          Your ledger, missions, journal and training history will all transfer — only your YouTube
+          API key must be re-entered.
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={dismiss}
+        aria-label="Dismiss"
+        className="mt-0.5 shrink-0 cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <X className="size-4" />
+      </button>
+    </div>
+  );
+}
+
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className="dark">
@@ -142,6 +200,8 @@ function RootComponent() {
             <Sidebar />
             <main className="min-w-0 flex-1 px-6 py-8 lg:px-10 lg:py-10">
               <div className="mx-auto w-full max-w-[1400px]">
+                {/* First-launch desktop migration hint — no-ops on web. */}
+                <DesktopMigrationBanner />
                 {/* Data-safety warnings outrank every page. */}
                 <StorageAlert />
                 {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}

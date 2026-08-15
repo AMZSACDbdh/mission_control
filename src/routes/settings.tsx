@@ -19,6 +19,7 @@ import {
 } from "@/data/activity";
 import { platform } from "@/platform";
 import { downloadBackup, restoreBackup } from "@/lib/backup";
+import { KEYS, writeJson } from "@/services/store";
 import { getApiKey, setApiKey } from "@/lib/youtube";
 import { DEFAULT_NAME } from "@/lib/profile";
 import { useActivity } from "@/hooks/use-activity";
@@ -60,8 +61,12 @@ function SettingsPage() {
     const result = await restoreBackup(text, events);
     if (result.mergedEvents) replaceAll(result.mergedEvents);
     setNotice({ ok: result.ok, message: result.message });
+    // A successful import counts as welcoming the user to the desktop app —
+    // suppress the migration banner so it does not linger after data has arrived.
+    if (result.ok) void writeJson(KEYS.desktopWelcomed, true);
   };
 
+  const isDesktop = platform.capabilities.name === "tauri";
   // Only ever true on the desktop build; the whole panel is absent on the web.
   const canAutostart = platform.capabilities.canAutostart;
   const [startupOn, setStartupOn] = useState(false);
@@ -169,9 +174,9 @@ function SettingsPage() {
       <Panel as="section" className="p-6">
         <PanelLabel>Your Data</PanelLabel>
         <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Everything lives in this browser and nowhere else. Clearing site data erases it
-          permanently. Export regularly — the file is plain JSON you can read, keep anywhere, and
-          restore into any browser.
+          {isDesktop
+            ? "Your data is stored in a file on your disk — no browser quota, and clearing browser data cannot erase it. Export regularly as a backup you can restore on any device or after a reinstall."
+            : "Everything lives in this browser and nowhere else. Clearing site data erases it permanently. Export regularly — the file is plain JSON you can read, keep anywhere, and restore into any browser."}
         </p>
 
         <div className="mt-5 flex flex-wrap items-center gap-3">
@@ -217,10 +222,10 @@ function SettingsPage() {
 
         <p className="mt-4 border-t border-border/40 pt-4 text-[0.7rem] leading-relaxed text-muted-foreground/80">
           Restoring <span className="text-foreground">merges</span> the ledger by event id rather
-          than overwriting it, so importing an old backup can never delete newer work. Moving to the
-          desktop app? Export here, then import there — everything travels except your YouTube API
-          key, which is deliberately kept out of the file and must be re-entered. Nothing is copied
-          or removed from this browser automatically.
+          than overwriting it, so importing an old backup can never delete newer work.{" "}
+          {isDesktop
+            ? "Everything travels in the file except your YouTube API key, which is deliberately kept out and must be re-entered."
+            : "Moving to the desktop app? Export here, then import there — everything travels except your YouTube API key, which is deliberately kept out of the file and must be re-entered. Nothing is copied or removed from this browser automatically."}
         </p>
       </Panel>
 

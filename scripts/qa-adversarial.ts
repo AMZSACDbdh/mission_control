@@ -4001,6 +4001,179 @@ t(
   "ledger behaviour moved after touching startup",
 );
 
+console.log("\n===== 30. FULL BACKUP ROUND-TRIP + MIGRATION ADVERSARIAL =====");
+// Simulates: web user exports, opens fresh desktop install, imports.
+// The storage adapter in Node reports all non-ledger writes as failures, so
+// we specifically test the ledger path (pure in-memory merge) and validate
+// the backup format contract — the non-ledger persistence path is proven by
+// section 28 above.
+
+// Build a synthetic full-export backup with multiple stores and a real ledger.
+const migE1 = makeEvent({
+  ref: "subtask:2026-03-01:t1:s1",
+  kind: "subtask",
+  area: "discipline",
+  xp: 33,
+  label: "step",
+});
+const migE2 = makeEvent({
+  ref: "focus:session-abc",
+  kind: "focus",
+  area: "mind",
+  xp: 120,
+  minutes: 120,
+  label: "deep work",
+});
+const migE3 = makeEvent({
+  ref: "journal:2026-03-01",
+  kind: "journal",
+  area: "spirit",
+  xp: 30,
+  label: "reflection",
+});
+const migLedger = [migE1, migE2, migE3];
+const migExpectedXp = sumXp(migLedger);
+
+const fullBackup = JSON.stringify({
+  format: "mission-control-backup",
+  version: 1,
+  exportedAt: "2026-03-01T18:00:00.000Z",
+  data: {
+    "mission-control-activity-v1": migLedger,
+    "mission-control-missions-v3": [{ id: "m1", title: "Ship it", done: false }],
+    "mission-control-journal-db": { "2026-03-01": { reflection: "Good day." } },
+    "mission-control-profile-v1": { name: "Test Pilot" },
+  },
+});
+
+const migResult = await restoreBackup(fullBackup, []);
+// Ledger portion always succeeds (in-memory merge); non-ledger stores fail in
+// Node since there is no localStorage — but the ledger events are still returned.
+t(
+  "full backup: merged events returned even when non-ledger writes fail",
+  migResult.mergedEvents !== undefined,
+  "mergedEvents should be set regardless of non-ledger store write outcome",
+);
+t(
+  "full backup: all 3 ledger events survive the merge",
+  (migResult.mergedEvents?.length ?? 0) === 3,
+  "got " + (migResult.mergedEvents?.length ?? 0),
+);
+t(
+  "full backup: total XP is preserved exactly",
+  sumXp(migResult.mergedEvents ?? []) === migExpectedXp,
+  "expected " + migExpectedXp + ", got " + sumXp(migResult.mergedEvents ?? []),
+);
+
+// Duplicate import over the same ledger — the nervous migrating user who clicks twice.
+const migResult2 = await restoreBackup(fullBackup, migResult.mergedEvents ?? []);
+t(
+  "full backup imported twice: ledger stays at 3 events (no duplication)",
+  (migResult2.mergedEvents?.length ?? 0) === 3,
+  "got " + (migResult2.mergedEvents?.length ?? 0),
+);
+t(
+  "full backup imported twice: XP unchanged",
+  sumXp(migResult2.mergedEvents ?? []) === migExpectedXp,
+  "expected " + migExpectedXp + " got " + sumXp(migResult2.mergedEvents ?? []),
+);
+
+// Corrupted individual fields within an otherwise-valid backup must not crash.
+const corruptLedgerBackup = JSON.stringify({
+  format: "mission-control-backup",
+  version: 1,
+  exportedAt: "2026-03-01T00:00:00.000Z",
+  data: {
+    // ledger is a string instead of array — not a valid events list
+    "mission-control-activity-v1": "corrupt",
+    "mission-control-missions-v3": { not: "an-array" },
+  },
+});
+let corruptThrew = false;
+let corruptResult: Awaited<ReturnType<typeof restoreBackup>> | null = null;
+try {
+  corruptResult = await restoreBackup(corruptLedgerBackup, []);
+} catch {
+  corruptThrew = true;
+}
+t("corrupted backup does not throw", !corruptThrew);
+// A non-array ledger should not be treated as events — merged ledger stays empty.
+t(
+  "non-array ledger field is ignored: current events preserved",
+  corruptResult?.mergedEvents === undefined || corruptResult.mergedEvents.length === 0,
+  "corrupted ledger merged something unexpected",
+);
+
+// Extra unknown keys in data must be silently ignored (forward compatibility).
+const futureBackup = JSON.stringify({
+  format: "mission-control-backup",
+  version: 1,
+  exportedAt: "2026-03-01T00:00:00.000Z",
+  data: {
+    "mission-control-activity-v1": [migE1],
+    "mission-control-unknown-future-key-v99": { some: "data" },
+  },
+});
+const futureResult = await restoreBackup(futureBackup, []);
+t(
+  "unknown keys in backup data are silently ignored",
+  // The unknown key is not written (it's not in BACKED_UP_KEYS), so no failure for it.
+  futureResult.mergedEvents?.length === 1,
+  "got " + futureResult.mergedEvents?.length,
+);
+
+// The ledger merge must be a total order regardless of which direction events flow.
+// Use ev() with explicit at timestamps so the test is not sensitive to Date.now().
+const dirA = ev({
+  ref: "focus-bonus:2026-03-01",
+  kind: "focus-bonus",
+  area: "mind",
+  xp: 50,
+  at: "2026-03-01T10:00:00.000Z",
+  label: "bonus",
+});
+// dirB shares the same ref but has a later timestamp and higher XP.
+const dirB = { ...dirA, id: "later-id", at: "2026-03-01T23:00:00.000Z", xp: 75 };
+// focus-bonus keeps the newest (RECOMPUTED_KINDS), not the earliest.
+const mergedAB = mergeLedgers([dirA], [dirB]);
+const mergedBA = mergeLedgers([dirB], [dirA]);
+t(
+  "recomputed kind: newest wins regardless of merge direction A→B",
+  sumXp(mergedAB) === 75,
+  "got " + sumXp(mergedAB),
+);
+t(
+  "recomputed kind: newest wins regardless of merge direction B→A",
+  sumXp(mergedBA) === 75,
+  "got " + sumXp(mergedBA),
+);
+t(
+  "recomputed kind: merge direction does not change the outcome",
+  sumXp(mergedAB) === sumXp(mergedBA),
+);
+
+// After a full migration, derived progression must match what the browser computed.
+// Use the merged ledger from the full backup restore and verify XP-derived values.
+const postMigEvents = migResult.mergedEvents ?? [];
+const postMigXp = sumXp(postMigEvents);
+const postMigProgression = (await import("../src/data/progression")).progressionFor(postMigXp);
+t(
+  "post-migration progression is finite and valid",
+  Number.isFinite(postMigProgression.currentLevel) && postMigProgression.currentLevel >= 1,
+  "got " + postMigProgression.currentLevel,
+);
+t(
+  "post-migration XP matches what the web export contained",
+  postMigXp === migExpectedXp,
+  "expected " + migExpectedXp + " got " + postMigXp,
+);
+// A fresh install importing one year of history should not have XP from after the export date.
+t(
+  "import cannot add XP beyond what the backup contained",
+  sumXp(migResult.mergedEvents ?? []) <= migExpectedXp + 1,
+  "got " + sumXp(migResult.mergedEvents ?? []),
+);
+
 console.log("\n" + P + " passed, " + F + " failed");
 if (fails.length) {
   console.log("\nFAILED INVARIANTS:");

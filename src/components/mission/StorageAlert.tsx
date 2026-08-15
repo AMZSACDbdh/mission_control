@@ -3,6 +3,7 @@ import { AlertTriangle, Download } from "lucide-react";
 import { downloadBackup } from "@/lib/backup";
 import { formatBytes } from "@/services/store";
 import { useActivity } from "@/hooks/use-activity";
+import { useProgression } from "@/hooks/use-progression";
 
 /**
  * The one warning this app must never fail to show.
@@ -21,8 +22,12 @@ import { useActivity } from "@/hooks/use-activity";
  */
 export function StorageAlert() {
   const { writeError, usage } = useActivity();
+  const { progressionWriteError } = useProgression();
 
-  const failing = writeError !== null;
+  // Either the ledger or the progression store failing is equally dangerous:
+  // unlock timestamps and chronicles are lost just as surely as XP events.
+  const failing = writeError !== null || progressionWriteError !== null;
+  const errorMessage = writeError ?? progressionWriteError;
   const warning = !failing && usage?.nearingLimit === true;
 
   if (!failing && !warning) return null;
@@ -45,7 +50,7 @@ export function StorageAlert() {
         </p>
         <p className="mt-1 text-[0.78rem] leading-relaxed text-muted-foreground">
           {failing
-            ? writeError
+            ? errorMessage
             : `Mission Control is using ${formatBytes(usage!.bytes)} of roughly ${formatBytes(
                 usage!.quota,
               )} (${usage!.percent}%). Export a backup now so nothing is at risk.`}

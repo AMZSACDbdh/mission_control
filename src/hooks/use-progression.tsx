@@ -94,6 +94,8 @@ type ProgressionContextValue = {
   /** The ceremony waiting to be shown, if any. */
   pendingCeremony: Ceremony | null;
   acknowledgeCeremony: () => void;
+  /** Non-null when a progression save has failed — unlock timestamps and chronicles are at risk. */
+  progressionWriteError: string | null;
 };
 
 const ProgressionContext = createContext<ProgressionContextValue | null>(null);
@@ -113,6 +115,7 @@ export function ProgressionProvider({ children }: { children: ReactNode }) {
   const { events, stats, hydrated: ledgerReady } = useActivity();
   const [store, setStore] = useState<ProgressionStore>(emptyStore);
   const [hydrated, setHydrated] = useState(false);
+  const [progressionWriteError, setProgressionWriteError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -128,7 +131,10 @@ export function ProgressionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    void writeJson(KEYS.progression, store);
+    void (async () => {
+      const result = await writeJson(KEYS.progression, store);
+      setProgressionWriteError(result.ok ? null : result.message);
+    })();
   }, [store, hydrated]);
 
   const lifetimeXP = stats.totalXp;
@@ -294,6 +300,7 @@ export function ProgressionProvider({ children }: { children: ReactNode }) {
       equip,
       pendingCeremony,
       acknowledgeCeremony,
+      progressionWriteError,
     }),
     [
       hydrated,
@@ -306,6 +313,7 @@ export function ProgressionProvider({ children }: { children: ReactNode }) {
       equip,
       pendingCeremony,
       acknowledgeCeremony,
+      progressionWriteError,
     ],
   );
 

@@ -26,6 +26,8 @@ export const KEYS = {
   youtubeKey: "mission-control-youtube-key-v1",
   profile: "mission-control-profile-v1",
   fitness: "mission-control-fitness-v1",
+  // Per-device UI flag — not user data, not backed up.
+  desktopWelcomed: "mission-control-desktop-welcomed-v1",
 } as const;
 
 export type StoreKey = (typeof KEYS)[keyof typeof KEYS];
