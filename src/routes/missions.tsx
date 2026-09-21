@@ -2,32 +2,28 @@ import { useState, useEffect, type ReactNode } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   AlertTriangle,
-  Sun,
-  CloudSun,
   Search,
-  SlidersHorizontal,
   ChevronLeft,
   ChevronRight,
   Plus,
-  Check,
-  Clock,
-  Calendar as CalendarIcon,
-  Tag,
-  Swords,
-  FolderKanban,
-  Dumbbell,
   User,
   DollarSign,
   GripVertical,
   X,
-  Sparkles,
-  BookOpen,
-  Filter,
-  CheckCircle2,
   Trash2,
-  Edit2,
 } from "lucide-react";
+import {
+  BookIcon,
+  CheckIcon,
+  ClockIcon,
+  KamonIcon,
+  KanbanIcon,
+  KoyomiIcon,
+  SealIcon,
+  StoneIcon,
+} from "@/components/mission/JapaneseIcons";
 
+import { useWeather } from "@/hooks/use-weather";
 import {
   Mission,
   MissionCategory,
@@ -56,6 +52,8 @@ export const Route = createFileRoute("/missions")({
 function MissionsPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [time, setTime] = useState(new Date());
+  const weather = useWeather();
+  const WeatherIcon = weather.icon;
 
   // Database state
   const [missions, setMissions] = useState<Mission[]>(initialMissions);
@@ -341,7 +339,7 @@ function MissionsPage() {
         <div className="flex items-center gap-4 text-xs">
           {/* Focus Emblem Button */}
           <div className="flex size-8 items-center justify-center rounded-full border border-[#D9CDBA] bg-[#F8F5EE] text-[#B38A3D] shadow-xs cursor-pointer hover:border-[#B38A3D] transition-colors">
-            <Sparkles className="size-4" />
+            <KamonIcon className="size-4" aria-hidden />
           </div>
 
           {/* Search Trigger Input */}
@@ -358,12 +356,16 @@ function MissionsPage() {
 
           {/* Weather Widget */}
           <div className="flex items-center gap-2 rounded-full border border-[#D9CDBA] bg-[#F8F5EE] px-3.5 py-1 text-xs">
-            <CloudSun className="size-4 text-[#B38A3D]" />
+            <WeatherIcon className="size-4 text-[#B38A3D]" aria-hidden />
             <div>
               <p className="font-semibold text-xs leading-none text-[#2D241B]">
-                {isMounted ? displayTime : "07:12 AM"}
+                {isMounted ? displayTime : "—"}
               </p>
-              <p className="text-[0.6rem] text-[#6E6254] mt-0.5">Kyoto, Japan</p>
+              <p className="text-[0.6rem] text-[#6E6254] mt-0.5">
+                {weather.temperatureC === null
+                  ? weather.condition
+                  : `${weather.temperatureC}° · ${weather.city || weather.condition}`}
+              </p>
             </div>
           </div>
 
@@ -465,7 +467,7 @@ function MissionsPage() {
                 title="MISSION INBOX"
                 count={inboxMissions.length}
                 columnId="inbox"
-                icon={<BookOpen className="size-4 text-[#6E6254]" />}
+                icon={<BookIcon className="size-4 text-[#6E6254]" aria-hidden />}
                 missions={inboxMissions}
                 onDragStart={handleDragStart}
                 onDrop={handleDropToColumn}
@@ -477,7 +479,7 @@ function MissionsPage() {
                 title="TODAY'S MISSIONS"
                 count={todayMissions.length}
                 columnId="today"
-                icon={<Clock className="size-4 text-[#6E6254]" />}
+                icon={<ClockIcon className="size-4 text-[#6E6254]" aria-hidden />}
                 missions={todayMissions}
                 onDragStart={handleDragStart}
                 onDrop={handleDropToColumn}
@@ -490,7 +492,7 @@ function MissionsPage() {
                 title="UPCOMING MISSIONS"
                 count={upcomingMissions.length}
                 columnId="upcoming"
-                icon={<CalendarIcon className="size-4 text-[#6E6254]" />}
+                icon={<KoyomiIcon className="size-4 text-[#6E6254]" aria-hidden />}
                 missions={upcomingMissions}
                 onDragStart={handleDragStart}
                 onDrop={handleDropToColumn}
@@ -503,7 +505,7 @@ function MissionsPage() {
                 title="COMPLETED"
                 count={completedMissions.length}
                 columnId="completed"
-                icon={<CheckCircle2 className="size-4 text-[#6E6254]" />}
+                icon={<SealIcon className="size-4 text-[#6E6254]" aria-hidden />}
                 missions={completedMissions}
                 onDragStart={handleDragStart}
                 onDrop={handleDropToColumn}
@@ -533,7 +535,7 @@ function MissionsPage() {
                             : "border-[#D9CDBA]"
                         }`}
                       >
-                        {m.completed && <Check className="size-2.5" />}
+                        {m.completed && <CheckIcon className="size-3" />}
                       </div>
                       <div>
                         <h4
@@ -674,9 +676,9 @@ function MissionsPage() {
             </h3>
             <div className="space-y-2 text-xs">
               {[
-                { name: "Study", icon: BookOpen, cat: "Study" as MissionCategory },
-                { name: "Projects", icon: FolderKanban, cat: "Projects" as MissionCategory },
-                { name: "Fitness", icon: Dumbbell, cat: "Fitness" as MissionCategory },
+                { name: "Study", icon: BookIcon, cat: "Study" as MissionCategory },
+                { name: "Projects", icon: KanbanIcon, cat: "Projects" as MissionCategory },
+                { name: "Fitness", icon: StoneIcon, cat: "Fitness" as MissionCategory },
                 { name: "Personal", icon: User, cat: "Personal" as MissionCategory },
                 { name: "Finance", icon: DollarSign, cat: "Finance" as MissionCategory },
               ].map((catItem) => {
@@ -1097,13 +1099,13 @@ function KanbanColumn({
               {/* Time or Due date */}
               <div className="flex items-center gap-2">
                 <span className="flex items-center gap-1 font-medium">
-                  <Clock className="size-2.5" />
+                  <ClockIcon className="size-2.5" aria-hidden />
                   {Math.floor(item.durationMinutes / 60)}h {item.durationMinutes % 60}m
                 </span>
 
                 {showDueDates && item.dueDate && (
                   <span className="flex items-center gap-1 font-semibold text-[#B38A3D]">
-                    <CalendarIcon className="size-2.5" />
+                    <KoyomiIcon className="size-2.5" aria-hidden />
                     {item.dueDate}
                   </span>
                 )}

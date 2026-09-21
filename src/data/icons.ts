@@ -1,14 +1,16 @@
+import type { ComponentType } from "react";
+
 import {
-  BookOpen,
-  Code2,
-  Coffee,
-  Dumbbell,
-  Moon,
-  PenLine,
-  Sunrise,
-  Target,
-  type LucideIcon,
-} from "lucide-react";
+  BookIcon,
+  BrushIcon,
+  MasuIcon,
+  MatoIcon,
+  MoonIcon,
+  ScrollIcon,
+  StoneIcon,
+  SunriseIcon,
+  TeaIcon,
+} from "@/components/mission/JapaneseIcons";
 
 import type { Area } from "./activity";
 import type { IconKey } from "./plan";
@@ -29,17 +31,19 @@ export const areaForIcon: Record<IconKey, Area> = {
   moon: "spirit",
 };
 
+export type TaskIcon = ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+
 /** Icons live outside the stored plan — a plan must serialise to plain JSON. */
-export const iconFor: Record<IconKey, LucideIcon> = {
-  study: BookOpen,
-  write: PenLine,
-  train: Dumbbell,
-  sunrise: Sunrise,
-  target: Target,
-  break: Coffee,
-  moon: Moon,
-  code: Code2,
-  read: BookOpen,
+export const iconFor: Record<IconKey, TaskIcon> = {
+  study: ScrollIcon,
+  write: BrushIcon,
+  train: StoneIcon,
+  sunrise: SunriseIcon,
+  target: MatoIcon,
+  break: TeaIcon,
+  moon: MoonIcon,
+  code: MasuIcon,
+  read: BookIcon,
 };
 
 export const iconChoices: { key: IconKey; label: string }[] = [

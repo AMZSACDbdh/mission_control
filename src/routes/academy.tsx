@@ -1,39 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { Search, Play, ArrowRight, Lock } from "lucide-react";
 import {
-  BookOpen,
-  Timer,
-  Swords,
-  Repeat,
-  Dumbbell,
-  FolderKanban,
-  CalendarDays,
-  NotebookPen,
-  Settings,
-  Flame,
-  Trophy,
-  Sparkles,
-  Sun,
-  CloudSun,
-  Search,
-  Filter,
-  Plus,
-  Play,
-  CheckCircle,
-  FileText,
-  Calendar,
-  Clock,
-  ChevronRight,
-  TrendingUp,
-  AlertCircle,
-  Compass,
-  ArrowRight,
-  Lock,
-  ChevronUp,
-  ChevronDown,
-} from "lucide-react";
+  BookIcon,
+  CheckIcon,
+  ClockIcon,
+  KoyomiIcon,
+  PagodaIcon,
+  PathIcon,
+  ScrollIcon,
+  TrendIcon,
+} from "@/components/mission/JapaneseIcons";
 
 import academyHero from "@/assets/academy-hero.png";
+import { useWeather } from "@/hooks/use-weather";
 import { Panel, PanelLabel } from "@/components/mission/Panel";
 import { ProgressBar } from "@/components/mission/ProgressBar";
 import { useCountUp, useAnimatedProgress } from "@/hooks/use-count-up";
@@ -287,6 +267,7 @@ const INITIAL_EXAMS: Exam[] = [
 function AcademyPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [time, setTime] = useState(new Date());
+  const weather = useWeather();
 
   // Storage and State
   const [courses, setCourses] = useState<Course[]>(INITIAL_COURSES);
@@ -495,7 +476,7 @@ function AcademyPage() {
           <div className="flex flex-col gap-3 self-start md:self-auto xl:mr-16">
             <div className="flex items-center gap-4 rounded-xl border border-border/60 bg-background/65 px-4 py-2.5 backdrop-blur-[2px] shadow-lg">
               <div className="flex items-center gap-2.5">
-                <Clock className="size-4.5 text-gold-soft animate-pulse" />
+                <ClockIcon className="size-4.5 text-gold-soft" aria-hidden />
                 <div className="text-right">
                   <p className="text-sm font-semibold text-foreground tracking-wider leading-none">
                     {isMounted ? timeString : "07:12 AM"}
@@ -507,11 +488,21 @@ function AcademyPage() {
               </div>
               <div className="h-6 w-px bg-border" aria-hidden />
               <div className="flex items-center gap-2">
-                <CloudSun className="size-4.5 text-gold-dim" />
+                {(() => {
+                  const WeatherIcon = weather.icon;
+                  return (
+                    <WeatherIcon
+                      className={`size-4.5 text-gold-dim ${weather.status === "loading" ? "animate-pulse" : ""}`}
+                      aria-hidden
+                    />
+                  );
+                })()}
                 <div>
-                  <p className="text-sm font-semibold text-foreground leading-none">23°C</p>
+                  <p className="text-sm font-semibold text-foreground leading-none">
+                    {weather.temperatureC === null ? "—" : `${weather.temperatureC}°C`}
+                  </p>
                   <p className="text-[0.65rem] text-muted-foreground mt-0.5 whitespace-nowrap">
-                    Kyoto, JP
+                    {weather.status === "loading" ? "Reading the sky" : weather.city || "—"}
                   </p>
                 </div>
               </div>
@@ -566,7 +557,7 @@ function AcademyPage() {
             <div className="space-y-4 rounded-2xl border border-border/60 bg-surface/20 p-4.5">
               <div className="flex items-center justify-between border-b border-border/40 pb-3">
                 <div className="flex items-center gap-2">
-                  <BookOpen className="size-4 text-gold" />
+                  <BookIcon className="size-4 text-gold" aria-hidden />
                   <h3 className="text-xs font-semibold tracking-widest text-foreground uppercase">
                     Current Courses
                   </h3>
@@ -656,7 +647,7 @@ function AcademyPage() {
             <div className="space-y-4 rounded-2xl border border-border/60 bg-surface/20 p-4.5">
               <div className="flex items-center justify-between border-b border-border/40 pb-3">
                 <div className="flex items-center gap-2">
-                  <Compass className="size-4 text-gold" />
+                  <PathIcon className="size-4 text-gold" aria-hidden />
                   <h3 className="text-xs font-semibold tracking-widest text-foreground uppercase">
                     Learning Roadmap
                   </h3>
@@ -710,9 +701,9 @@ function AcademyPage() {
                         }`}
                       >
                         {isCompleted ? (
-                          <CheckCircle className="size-3.5" />
+                          <CheckIcon className="size-3.5" />
                         ) : isActive ? (
-                          <TrendingUp className="size-3" />
+                          <TrendIcon className="size-3" />
                         ) : (
                           <Lock className="size-2.5" />
                         )}
@@ -748,7 +739,7 @@ function AcademyPage() {
             <div className="rounded-2xl border border-border/60 bg-surface/20 p-4.5 space-y-4">
               <div className="flex items-center justify-between border-b border-border/40 pb-3">
                 <div className="flex items-center gap-2">
-                  <NotebookPen className="size-4 text-gold" />
+                  <ScrollIcon className="size-4 text-gold" aria-hidden />
                   <h3 className="text-xs font-semibold tracking-widest text-foreground uppercase">
                     Virtual Bookshelf
                   </h3>
@@ -885,7 +876,7 @@ function AcademyPage() {
           <div className="rounded-2xl border border-border/60 bg-surface/20 p-4.5 space-y-4">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
               <div className="flex items-center gap-2">
-                <TrendingUp className="size-4 text-gold" />
+                <TrendIcon className="size-4 text-gold" aria-hidden />
                 <h3 className="text-xs font-semibold tracking-widest text-foreground uppercase">
                   Weekly Analytics
                 </h3>
@@ -1004,7 +995,7 @@ function AcademyPage() {
           <div className="rounded-2xl border border-border/60 bg-surface/20 p-4.5 space-y-4">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
               <div className="flex items-center gap-2">
-                <FileText className="size-4 text-gold" />
+                <ScrollIcon className="size-4 text-gold" aria-hidden />
                 <h3 className="text-xs font-semibold tracking-widest text-foreground uppercase">
                   Assignments
                 </h3>
@@ -1041,7 +1032,7 @@ function AcademyPage() {
 
                   <div className="flex justify-between items-center text-[0.62rem] text-muted-foreground mt-1">
                     <div className="flex items-center gap-1">
-                      <Calendar className="size-3" />
+                      <KoyomiIcon className="size-3" aria-hidden />
                       <span>
                         Due{" "}
                         {new Date(assign.dueDate).toLocaleDateString("en-US", {
@@ -1071,7 +1062,7 @@ function AcademyPage() {
           <div className="rounded-2xl border border-border/60 bg-surface/20 p-4.5 space-y-4">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
               <div className="flex items-center gap-2">
-                <CalendarDays className="size-4 text-gold" />
+                <KoyomiIcon className="size-4 text-gold" aria-hidden />
                 <h3 className="text-xs font-semibold tracking-widest text-foreground uppercase">
                   Upcoming Exams
                 </h3>
@@ -1126,7 +1117,7 @@ function AcademyPage() {
           <div className="rounded-2xl border border-border/60 bg-surface/20 p-4.5 space-y-4 flex flex-col justify-between">
             <div className="flex items-center justify-between border-b border-border/40 pb-3">
               <div className="flex items-center gap-2">
-                <Trophy className="size-4 text-gold" />
+                <PagodaIcon className="size-4 text-gold" aria-hidden />
                 <h3 className="text-xs font-semibold tracking-widest text-foreground uppercase">
                   Mastery Progress
                 </h3>

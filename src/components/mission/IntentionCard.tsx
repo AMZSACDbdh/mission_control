@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Check, Pencil } from "lucide-react";
+import { Pencil } from "lucide-react";
+import { CheckIcon } from "./JapaneseIcons";
 
 import { Panel, SectionLabel } from "./Panel";
 
@@ -37,7 +38,7 @@ export function IntentionCard({
           onClick={handleToggle}
           className="inline-flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-[0.62rem] tracking-[0.12em] text-muted-foreground/70 uppercase transition-colors duration-300 hover:text-gold"
         >
-          {editing ? <Check className="size-3" /> : <Pencil className="size-3" />}
+          {editing ? <CheckIcon className="size-3" /> : <Pencil className="size-3" />}
           {editing ? "Save" : "Edit"}
         </button>
       </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Check, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
+import { CheckIcon } from "./JapaneseIcons";
 
 import { Panel, PanelLabel } from "./Panel";
 import { KamonIcon } from "./JapaneseIcons";
@@ -109,7 +110,9 @@ export function Collections() {
                         {reward.name}
                       </span>
                       {isEquipped && (
-                        <Check className="size-3 shrink-0 text-gold" aria-label="Equipped" />
+                        <span role="img" aria-label="Equipped" className="contents">
+                          <CheckIcon className="size-3 shrink-0 text-gold" />
+                        </span>
                       )}
                     </span>
                     <span className="mt-0.5 block truncate text-[0.62rem] text-muted-foreground/80">

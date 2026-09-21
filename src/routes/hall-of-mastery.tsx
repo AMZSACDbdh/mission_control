@@ -1,21 +1,21 @@
 import { useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
-  Award,
-  BookOpen,
-  Clock,
-  Dumbbell,
-  Flame,
-  Footprints,
-  Moon,
-  Scale,
-  Shield,
-  Sparkles,
-  Sunrise,
-  Target,
-  TrendingUp,
-  Trophy,
-} from "lucide-react";
+  BalanceIcon,
+  BookIcon,
+  ClockIcon,
+  EnsoIcon,
+  FlameIcon,
+  KabutoIcon,
+  KamonIcon,
+  MatoIcon,
+  MoonIcon,
+  PathIcon,
+  SealIcon,
+  StoneIcon,
+  SunriseIcon,
+  TrendIcon,
+} from "@/components/mission/JapaneseIcons";
 
 import { Collections, MenkyoShelf } from "@/components/mission/Collections";
 import { EnsoRing } from "@/components/mission/EnsoRing";
@@ -52,16 +52,16 @@ export const Route = createFileRoute("/hall-of-mastery")({
 
 /** Achievement badges, unlocked by the same real statistics as the seals. */
 const achievementDefs = [
-  { name: "Discipline Defender", icon: Shield, requirement: "7-day streak", at: 7 },
-  { name: "Dawn Warrior", icon: Sunrise, requirement: "Log 5 days", at: 5 },
-  { name: "Focus Master", icon: Target, requirement: "10 hours focused", at: 600 },
-  { name: "Silent Practitioner", icon: Moon, requirement: "25 hours focused", at: 1500 },
-  { name: "Consistency Champion", icon: Flame, requirement: "30-day streak", at: 30 },
-  { name: "Knowledge Seeker", icon: BookOpen, requirement: "Reach level 5", at: 5 },
-  { name: "Iron Will", icon: Dumbbell, requirement: "Reach level 10", at: 10 },
-  { name: "Path of Growth", icon: TrendingUp, requirement: "Reach level 15", at: 15 },
-  { name: "Master of Routine", icon: Footprints, requirement: "60-day streak", at: 60 },
-  { name: "Balanced Warrior", icon: Scale, requirement: "All five areas at 50%", at: 50 },
+  { name: "Discipline Defender", icon: KabutoIcon, requirement: "7-day streak", at: 7 },
+  { name: "Dawn Warrior", icon: SunriseIcon, requirement: "Log 5 days", at: 5 },
+  { name: "Focus Master", icon: MatoIcon, requirement: "10 hours focused", at: 600 },
+  { name: "Silent Practitioner", icon: MoonIcon, requirement: "25 hours focused", at: 1500 },
+  { name: "Consistency Champion", icon: FlameIcon, requirement: "30-day streak", at: 30 },
+  { name: "Knowledge Seeker", icon: BookIcon, requirement: "Reach level 5", at: 5 },
+  { name: "Iron Will", icon: StoneIcon, requirement: "Reach level 10", at: 10 },
+  { name: "Path of Growth", icon: TrendIcon, requirement: "Reach level 15", at: 15 },
+  { name: "Master of Routine", icon: PathIcon, requirement: "60-day streak", at: 60 },
+  { name: "Balanced Warrior", icon: BalanceIcon, requirement: "All five areas at 50%", at: 50 },
 ] as const;
 
 function Counter({ value, decimals = 0 }: { value: number; decimals?: number }) {
@@ -131,20 +131,20 @@ function HallOfMasteryPage() {
     : 100;
 
   const lifetimeStats = [
-    { label: "Lifetime XP", value: stats.totalXp, unit: "XP Earned", icon: Sparkles, decimals: 0 },
-    { label: "Longest Streak", value: longest, unit: "Days", icon: Flame, decimals: 0 },
+    { label: "Lifetime XP", value: stats.totalXp, unit: "XP Earned", icon: KamonIcon, decimals: 0 },
+    { label: "Longest Streak", value: longest, unit: "Days", icon: FlameIcon, decimals: 0 },
     {
       label: "Total Hours",
       value: Math.round((stats.totalMinutes / 60) * 10) / 10,
       unit: "Hours",
-      icon: Clock,
+      icon: ClockIcon,
       decimals: 1,
     },
     {
       label: "Seals Unlocked",
       value: sealsUnlocked,
       unit: `of ${sealsTotal}`,
-      icon: Award,
+      icon: SealIcon,
       decimals: 0,
     },
   ];
@@ -512,7 +512,7 @@ function HallOfMasteryPage() {
       <Collections />
 
       <footer className="flex items-center justify-center gap-3 pt-2 pb-4">
-        <Trophy className="size-3.5 text-gold-dim" aria-hidden />
+        <EnsoIcon className="size-3.5 text-gold-dim" aria-hidden />
         <p className="font-display text-[0.72rem] tracking-widest text-muted-foreground italic">
           日々鍛錬、一生成長 — Train every day. Grow for a lifetime.
         </p>

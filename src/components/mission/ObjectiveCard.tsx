@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { CheckIcon } from "./JapaneseIcons";
 
 import { EnsoRing } from "./EnsoRing";
 import { Panel, SectionLabel } from "./Panel";
@@ -89,7 +89,7 @@ export function ObjectiveCard({
                     )}
                     aria-hidden
                   >
-                    <Check className="size-2.5 stroke-[3]" />
+                    <CheckIcon className="size-3" />
                   </span>
                   <span
                     className={cn(

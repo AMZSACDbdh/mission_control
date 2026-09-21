@@ -1,13 +1,16 @@
+import type { ComponentType } from "react";
+
 import {
-  BookOpen,
-  Dumbbell,
-  PenLine,
-  Coffee,
-  Sunrise,
-  Target,
-  Moon,
-  type LucideIcon,
-} from "lucide-react";
+  BrushIcon,
+  MatoIcon,
+  MoonIcon,
+  ScrollIcon,
+  StoneIcon,
+  SunriseIcon,
+  TeaIcon,
+} from "@/components/mission/JapaneseIcons";
+
+type TaskIcon = ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
 
 export type Priority = "critical" | "high" | "standard";
 
@@ -19,7 +22,7 @@ export type EssentialTask = {
   priority: Priority;
   progress: number; // 0-100
   completed: boolean;
-  icon: LucideIcon;
+  icon: TaskIcon;
 };
 
 export const initialTasks: EssentialTask[] = [
@@ -31,7 +34,7 @@ export const initialTasks: EssentialTask[] = [
     priority: "critical",
     progress: 60,
     completed: false,
-    icon: BookOpen,
+    icon: ScrollIcon,
   },
   {
     id: "task-assignment",
@@ -41,7 +44,7 @@ export const initialTasks: EssentialTask[] = [
     priority: "high",
     progress: 25,
     completed: false,
-    icon: PenLine,
+    icon: BrushIcon,
   },
   {
     id: "task-training",
@@ -51,7 +54,7 @@ export const initialTasks: EssentialTask[] = [
     priority: "standard",
     progress: 0,
     completed: false,
-    icon: Dumbbell,
+    icon: StoneIcon,
   },
 ];
 
@@ -63,7 +66,7 @@ export type TimelineBlock = {
   label: string;
   detail: string;
   status: TimelineStatus;
-  icon: LucideIcon;
+  icon: TaskIcon;
 };
 
 export const timeline: TimelineBlock[] = [
@@ -73,7 +76,7 @@ export const timeline: TimelineBlock[] = [
     label: "Morning Routine",
     detail: "Breathwork, cold shower, green tea.",
     status: "completed",
-    icon: Sunrise,
+    icon: SunriseIcon,
   },
   {
     id: "deep-work",
@@ -81,7 +84,7 @@ export const timeline: TimelineBlock[] = [
     label: "Deep Work",
     detail: "High focus • No distractions.",
     status: "completed",
-    icon: Target,
+    icon: MatoIcon,
   },
   {
     id: "break",
@@ -89,7 +92,7 @@ export const timeline: TimelineBlock[] = [
     label: "Break",
     detail: "Rest. Reflect. Reset.",
     status: "current",
-    icon: Coffee,
+    icon: TeaIcon,
   },
   {
     id: "study",
@@ -97,7 +100,7 @@ export const timeline: TimelineBlock[] = [
     label: "Study",
     detail: "Advanced Machine Learning, module 7.",
     status: "upcoming",
-    icon: BookOpen,
+    icon: ScrollIcon,
   },
   {
     id: "workout",
@@ -105,7 +108,7 @@ export const timeline: TimelineBlock[] = [
     label: "Workout",
     detail: "Lower body strength, 60 minutes.",
     status: "upcoming",
-    icon: Dumbbell,
+    icon: StoneIcon,
   },
   {
     id: "evening",
@@ -113,7 +116,7 @@ export const timeline: TimelineBlock[] = [
     label: "Evening Review",
     detail: "Journal the day, plan tomorrow.",
     status: "upcoming",
-    icon: Moon,
+    icon: MoonIcon,
   },
 ];
 

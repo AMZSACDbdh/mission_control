@@ -1,24 +1,21 @@
 import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { Code, Sparkles, ArrowUpRight } from "lucide-react";
 import {
-  Sun,
-  CloudSun,
-  Bell,
-  Check,
-  Target,
-  Droplets,
-  Dumbbell,
-  BookOpen,
-  Flower2,
-  Code,
-  GraduationCap,
-  FileText,
-  Footprints,
-  Sparkles,
-  ArrowUpRight,
-} from "lucide-react";
+  BookIcon,
+  BrushIcon,
+  CheckIcon,
+  DropIcon,
+  LotusIcon,
+  MatoIcon,
+  PathIcon,
+  ScrollIcon,
+  StoneIcon,
+  SunriseIcon,
+} from "@/components/mission/JapaneseIcons";
 
 import { previousDay, XP } from "@/data/activity";
+import { useWeather } from "@/hooks/use-weather";
 import {
   consistencyOver,
   defaultDisciplines,
@@ -51,12 +48,11 @@ export const Route = createFileRoute("/disciplines")({
 function DailyDisciplinesPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [time, setTime] = useState(new Date());
-
-  // Interactive controls
   const [focusMode, setFocusMode] = useState(false);
-  const [showNotificationPopover, setShowNotificationPopover] = useState(false);
 
   const { events, today, toggle } = useActivity();
+  const weather = useWeather();
+  const WeatherIcon = weather.icon;
 
   /**
    * Completion is never stored on the discipline. It is a dated ledger entry,
@@ -186,7 +182,7 @@ function DailyDisciplinesPage() {
         <div className="flex flex-wrap items-center gap-4 text-xs">
           {/* Time & Date */}
           <div className="flex items-center gap-2.5">
-            <Sun className="size-4 text-[#B38A3D] animate-spin-slow" />
+            <SunriseIcon className="size-4 text-[#B38A3D]" aria-hidden />
             <div>
               <p className="font-semibold text-sm leading-none text-[#2D241B]">
                 {isMounted ? displayTime : "07:12 AM"}
@@ -199,12 +195,16 @@ function DailyDisciplinesPage() {
 
           <div className="h-6 w-px bg-[#D9CDBA]" />
 
-          {/* Weather */}
+          {/* Weather — real data from the weather hook */}
           <div className="flex items-center gap-2">
-            <CloudSun className="size-4 text-[#6E6254]" />
+            <WeatherIcon className="size-4 text-[#B38A3D]" aria-hidden />
             <div>
-              <p className="font-semibold text-xs leading-none text-[#2D241B]">23°C</p>
-              <p className="text-[0.62rem] text-[#6E6254] mt-0.5">Kyoto, Japan</p>
+              <p className="font-semibold text-xs leading-none text-[#2D241B]">
+                {weather.temperatureC === null ? "—" : `${weather.temperatureC}°`}
+              </p>
+              <p className="text-[0.62rem] text-[#6E6254] mt-0.5">
+                {weather.city || weather.condition}
+              </p>
             </div>
           </div>
 
@@ -220,49 +220,10 @@ function DailyDisciplinesPage() {
             }`}
           >
             <div className="size-3 rounded-full bg-[#B38A3D] flex items-center justify-center">
-              <Target className="size-2 text-[#F2ECE1]" />
+              <MatoIcon className="size-2.5 text-[#F2ECE1]" aria-hidden />
             </div>
             <span>Focus Mode</span>
           </button>
-
-          {/* Notifications Button */}
-          <div className="relative">
-            <button
-              onClick={() => setShowNotificationPopover(!showNotificationPopover)}
-              className="relative p-2 rounded-full border border-[#D9CDBA] bg-[#F8F5EE] text-[#2D241B] hover:border-[#B38A3D] transition-colors cursor-pointer"
-              title="Notifications"
-            >
-              <Bell className="size-4" />
-              <span className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-red-700 text-[0.55rem] font-bold text-white shadow-xs">
-                1
-              </span>
-            </button>
-
-            {/* Notifications Popover */}
-            {showNotificationPopover && (
-              <div className="absolute right-0 mt-2 w-64 rounded-xl border border-[#D9CDBA] bg-[#F8F5EE] p-3 shadow-xl z-50 text-xs space-y-2 animate-rise">
-                <p className="font-bold border-b border-[#D9CDBA] pb-1 text-[#2D241B]">
-                  Notifications
-                </p>
-                <div className="text-[0.68rem] text-[#6E6254] space-y-1">
-                  {streak > 0 ? (
-                    <>
-                      <p className="font-semibold text-[#2D241B]">{streak}-day streak running</p>
-                      <p>
-                        {completedCount} of {totalCount} kept today. Weekly consistency{" "}
-                        {weeklyConsistency}%.
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="font-semibold text-[#2D241B]">Nothing kept yet today</p>
-                      <p>Complete any discipline to start a streak.</p>
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       </header>
 
@@ -475,7 +436,7 @@ function DailyDisciplinesPage() {
             <span>
               {completedCount} of {totalCount} Completed
             </span>
-            <Flower2 className="size-4 text-[#B38A3D]" />
+            <LotusIcon className="size-4 text-[#B38A3D]" aria-hidden />
           </div>
         </div>
 
@@ -548,20 +509,26 @@ function DailyDisciplinesPage() {
                   {/* Center Icon */}
                   <div className="absolute inset-0 flex items-center justify-center text-[#2D241B]">
                     {item.iconType === "hydration" && (
-                      <Droplets className="size-7 text-[#4F5E4E]" />
+                      <DropIcon className="size-7 text-[#4F5E4E]" aria-hidden />
                     )}
-                    {item.iconType === "workout" && <Dumbbell className="size-7 text-[#4F5E4E]" />}
-                    {item.iconType === "reading" && <BookOpen className="size-7 text-[#4F5E4E]" />}
+                    {item.iconType === "workout" && (
+                      <StoneIcon className="size-7 text-[#4F5E4E]" aria-hidden />
+                    )}
+                    {item.iconType === "reading" && (
+                      <BookIcon className="size-7 text-[#4F5E4E]" aria-hidden />
+                    )}
                     {item.iconType === "meditation" && (
-                      <Flower2 className="size-7 text-[#4F5E4E]" />
+                      <LotusIcon className="size-7 text-[#4F5E4E]" aria-hidden />
                     )}
                     {item.iconType === "coding" && <Code className="size-7 text-[#4F5E4E]" />}
                     {item.iconType === "study" && (
-                      <GraduationCap className="size-7 text-[#4F5E4E]" />
+                      <ScrollIcon className="size-7 text-[#4F5E4E]" aria-hidden />
                     )}
-                    {item.iconType === "journal" && <FileText className="size-7 text-[#4F5E4E]" />}
+                    {item.iconType === "journal" && (
+                      <BrushIcon className="size-7 text-[#4F5E4E]" aria-hidden />
+                    )}
                     {item.iconType === "walking" && (
-                      <Footprints className="size-7 text-[#4F5E4E]" />
+                      <PathIcon className="size-7 text-[#4F5E4E]" aria-hidden />
                     )}
                   </div>
                 </div>
@@ -586,7 +553,7 @@ function DailyDisciplinesPage() {
                         : "border border-[#D9CDBA] bg-transparent text-transparent"
                     }`}
                   >
-                    <Check className="size-3 stroke-[3]" />
+                    <CheckIcon className="size-3.5" />
                   </div>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Flame, Moon, Sparkles, Trophy } from "lucide-react";
+import { FlameIcon, KamonIcon, MoonIcon, PagodaIcon } from "@/components/mission/JapaneseIcons";
 
 import { HeroBanner } from "@/components/mission/HeroBanner";
 import { IntentionCard } from "@/components/mission/IntentionCard";
@@ -283,7 +283,7 @@ function Index() {
             onClick={() => setPlannerOpen(true)}
             className="flex cursor-pointer items-center gap-2 rounded-full border border-border/60 px-4 py-2 text-[0.65rem] tracking-[0.14em] text-muted-foreground uppercase transition-colors hover:border-gold/50 hover:text-gold"
           >
-            <Moon className="size-3.5" aria-hidden />
+            <MoonIcon className="size-3.5" aria-hidden />
             {tomorrowPlanned ? "Edit tomorrow's plan" : "Plan tomorrow"}
           </button>
         </div>
@@ -335,7 +335,7 @@ function Index() {
               ? `${nextRank.name} awaits at level ${nextRank.fromLevel}.`
               : "The highest rank. Hold it."
           }
-          icon={Trophy}
+          icon={PagodaIcon}
           motif="kamon"
         />
         <StatCard
@@ -348,7 +348,7 @@ function Index() {
               : `${(progression.xpForNextLevel - progression.xpIntoLevel).toLocaleString()} XP to level ${progression.currentLevel + 1}.`
           }
           progress={progression.progressPercent}
-          icon={Sparkles}
+          icon={KamonIcon}
           motif="kamon"
         />
         <StatCard
@@ -363,7 +363,7 @@ function Index() {
                 : `Your best is ${longest} days.${streakTokens > 0 ? ` ${streakTokens} grace in hand.` : ""}`
           }
           progress={longest > 0 ? Math.min(100, (streak / longest) * 100) : 0}
-          icon={Flame}
+          icon={FlameIcon}
           motif="bamboo"
         />
       </section>

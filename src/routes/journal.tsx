@@ -1,18 +1,16 @@
 import { useState, useEffect } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
 import {
-  AlertTriangle,
-  Clock,
-  ChevronLeft,
-  ChevronRight,
-  Sparkles,
-  BookOpen,
-  Calendar,
-  PenTool,
-  Check,
-  Heart,
-  Notebook,
-} from "lucide-react";
+  BookIcon,
+  BrushIcon,
+  ClockIcon,
+  KoyomiIcon,
+  LotusIcon,
+  PathIcon,
+  SakuraIcon,
+  ScrollIcon,
+} from "@/components/mission/JapaneseIcons";
 
 import { KEYS, readJson, writeJson } from "@/services/store";
 import { dayKeyFor, XP } from "@/data/activity";
@@ -269,7 +267,7 @@ function JournalPage() {
           </div>
 
           <div className="flex items-center gap-3.5 rounded-lg border border-border/50 bg-surface/30 px-3.5 py-1.5 shadow-sm">
-            <Clock className="size-4 text-gold-soft animate-pulse" />
+            <ClockIcon className="size-4 text-gold-soft" aria-hidden />
             <div className="text-right">
               <p className="text-sm font-semibold tracking-wider leading-none">
                 {isMounted ? displayTime : ""}
@@ -402,7 +400,7 @@ function JournalPage() {
                 {/* 1. TODAY'S REFLECTION */}
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2 border-b border-[#D9CDBA] pb-1.5">
-                    <PenTool className="size-3.5 text-gold-dim" />
+                    <BrushIcon className="size-3.5 text-gold-dim" aria-hidden />
                     <h3 className="font-display text-sm font-semibold tracking-wider text-[#2D241B] uppercase">
                       Today's Reflection
                     </h3>
@@ -427,7 +425,7 @@ function JournalPage() {
                 {/* 2. LESSONS LEARNED */}
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2 border-b border-[#D9CDBA] pb-1.5">
-                    <BookOpen className="size-3.5 text-gold-dim" />
+                    <BookIcon className="size-3.5 text-gold-dim" aria-hidden />
                     <h3 className="font-display text-sm font-semibold tracking-wider text-[#2D241B] uppercase">
                       Lessons Learned
                     </h3>
@@ -452,7 +450,7 @@ function JournalPage() {
                 {/* 3. GRATITUDE */}
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2 border-b border-[#D9CDBA] pb-1.5">
-                    <Heart className="size-3.5 text-gold-dim" />
+                    <SakuraIcon className="size-3.5 text-gold-dim" aria-hidden />
                     <h3 className="font-display text-sm font-semibold tracking-wider text-[#2D241B] uppercase">
                       Gratitude
                     </h3>
@@ -482,7 +480,7 @@ function JournalPage() {
                 {/* 4. TOMORROW'S INTENTION */}
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2 border-b border-[#D9CDBA] pb-1.5">
-                    <Sparkles className="size-3.5 text-gold-dim" />
+                    <PathIcon className="size-3.5 text-gold-dim" aria-hidden />
                     <h3 className="font-display text-sm font-semibold tracking-wider text-[#2D241B] uppercase">
                       Tomorrow's Intention
                     </h3>
@@ -522,7 +520,7 @@ function JournalPage() {
                 {/* 1. DAILY NOTES */}
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2 border-b border-[#D9CDBA] pb-1.5">
-                    <Notebook className="size-3.5 text-gold-dim" />
+                    <ScrollIcon className="size-3.5 text-gold-dim" aria-hidden />
                     <h3 className="font-display text-sm font-semibold tracking-wider text-[#2D241B] uppercase">
                       Daily Notes
                     </h3>
@@ -547,7 +545,7 @@ function JournalPage() {
                 {/* 2. IDEAS */}
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-2 border-b border-[#D9CDBA] pb-1.5">
-                    <Sparkles className="size-3.5 text-gold-dim" />
+                    <LotusIcon className="size-3.5 text-gold-dim" aria-hidden />
                     <h3 className="font-display text-sm font-semibold tracking-wider text-[#2D241B] uppercase">
                       Ideas
                     </h3>
@@ -622,7 +620,7 @@ function JournalPage() {
                 {/* 3. MOOD TRACKER */}
                 <div className="space-y-1.5 pt-1">
                   <div className="flex items-center gap-2 border-b border-[#D9CDBA] pb-1">
-                    <Calendar className="size-3.5 text-gold-dim" />
+                    <KoyomiIcon className="size-3.5 text-gold-dim" aria-hidden />
                     <h3 className="font-display text-[0.68rem] font-bold tracking-wider text-[#2D241B] uppercase">
                       Mood Tracker
                     </h3>

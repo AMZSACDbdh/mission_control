@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, Check, Moon, Timer } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 import { EnsoRing } from "@/components/mission/EnsoRing";
 import { InkArt } from "@/components/mission/InkArt";
@@ -8,7 +8,15 @@ import { PageHeader } from "@/components/mission/PageHeader";
 import { Panel, PanelLabel } from "@/components/mission/Panel";
 import { SealStamp } from "@/components/mission/SealStamp";
 import { StatTile } from "@/components/mission/StatTile";
-import { BambooIcon, FlameIcon, KatanaIcon, LotusIcon } from "@/components/mission/JapaneseIcons";
+import {
+  BambooIcon,
+  CheckIcon,
+  FlameIcon,
+  HourglassIcon,
+  KatanaIcon,
+  LotusIcon,
+  MoonIcon,
+} from "@/components/mission/JapaneseIcons";
 import { useNow } from "@/hooks/use-now";
 import { useActivity } from "@/hooks/use-activity";
 import { dayKey } from "@/data/daily";
@@ -308,7 +316,7 @@ function FitnessPage() {
                       }`}
                       aria-hidden
                     >
-                      <Check className="size-3 stroke-[3]" />
+                      <CheckIcon className="size-3.5" />
                     </span>
 
                     <span className="min-w-0 flex-1">
@@ -344,7 +352,7 @@ function FitnessPage() {
             </div>
             <p className="mt-2 flex items-center justify-between text-[0.6rem] tracking-[0.12em] text-muted-foreground uppercase">
               <span className="flex items-center gap-1.5">
-                <Timer className="size-3" aria-hidden />
+                <HourglassIcon className="size-3" aria-hidden />
                 Est. 60 minutes
               </span>
               <span>{sessionProgress}% complete</span>
@@ -370,7 +378,7 @@ function FitnessPage() {
                 </span>
               </EnsoRing>
               <p className="mt-4 flex items-center gap-2 text-[0.65rem] text-muted-foreground">
-                <Moon className="size-3 text-gold-dim" aria-hidden />
+                <MoonIcon className="size-3 text-gold-dim" aria-hidden />
                 7h 24m sleep · HRV steady
               </p>
               <p className="font-display mt-3 border-t border-border/40 pt-3 text-[0.68rem] text-muted-foreground italic">

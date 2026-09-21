@@ -1,4 +1,4 @@
-import type { LucideIcon } from "lucide-react";
+import type { ComponentType } from "react";
 
 import { Panel, PanelLabel } from "./Panel";
 import { ProgressBar } from "./ProgressBar";
@@ -11,7 +11,7 @@ export type StatCardProps = {
   suffix?: string;
   caption?: string;
   progress?: number;
-  icon?: LucideIcon;
+  icon?: ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
   /** Decorative watermark bleeding off the card's right edge. */
   motif?: InkMotif | "kamon";
 };

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Check, Loader2, Plus, Trash2, Youtube } from "lucide-react";
+import { Loader2, Plus, Trash2, Youtube } from "lucide-react";
+import { CheckIcon } from "./JapaneseIcons";
 
 import { Panel, PanelLabel } from "./Panel";
 import { ScrollIcon } from "./JapaneseIcons";
@@ -229,7 +230,7 @@ export function SeriesTracker({ today }: { today: string }) {
                           onClick={() => toggleEpisode(s, next.id, true)}
                           className="flex h-9 shrink-0 cursor-pointer items-center gap-2 rounded-full bg-linear-to-r from-gold-dim via-gold to-gold-soft px-5 text-[0.62rem] font-bold tracking-[0.14em] text-primary-foreground uppercase transition-all hover:brightness-110"
                         >
-                          <Check className="size-3.5" />
+                          <CheckIcon className="size-3.5" />
                           Mark done
                         </button>
                         <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground">

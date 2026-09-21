@@ -1,4 +1,4 @@
-import { Check } from "lucide-react";
+import { CheckIcon } from "./JapaneseIcons";
 
 import { Panel, SectionLabel } from "./Panel";
 import { iconFor } from "@/data/icons";
@@ -112,7 +112,7 @@ export function FocusTimeline({
                     )}
                   >
                     {isDone ? (
-                      <Check className="size-4" aria-hidden />
+                      <CheckIcon className="size-4" aria-hidden />
                     ) : (
                       <Icon className="size-4" aria-hidden />
                     )}

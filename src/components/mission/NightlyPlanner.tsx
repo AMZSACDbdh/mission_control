@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { BellRing, Check, Moon, X } from "lucide-react";
+import { BellRing, X } from "lucide-react";
+import { CheckIcon, MoonIcon } from "./JapaneseIcons";
 
 import { Panel, PanelLabel } from "./Panel";
 import { SealStamp } from "./SealStamp";
@@ -117,7 +118,7 @@ export function NightlyPlanner({
     <Panel as="section" className="animate-rise p-6" interactive={false}>
       <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border/40 pb-4">
         <div className="flex items-start gap-3">
-          <Moon className="mt-0.5 size-5 shrink-0 text-gold animate-glow" aria-hidden />
+          <MoonIcon className="mt-0.5 size-5 shrink-0 text-gold animate-glow" aria-hidden />
           <div>
             <PanelLabel className="mb-1">Plan Tomorrow</PanelLabel>
             <p className="text-sm text-muted-foreground">
@@ -277,7 +278,7 @@ export function NightlyPlanner({
           disabled={!canSave}
           className="flex h-10 cursor-pointer items-center gap-2 rounded-full bg-linear-to-r from-gold-dim via-gold to-gold-soft px-6 text-[0.7rem] font-bold tracking-[0.16em] text-primary-foreground uppercase shadow-[0_0_20px_oklch(0.78_0.11_82/25%)] transition-all duration-300 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <Check className="size-4" />
+          <CheckIcon className="size-4" />
           Set Tomorrow
         </button>
       </div>

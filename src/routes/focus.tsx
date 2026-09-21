@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Coffee, Pause, Play, RotateCcw, ShieldCheck, SkipForward } from "lucide-react";
+import { Pause, Play, RotateCcw, SkipForward } from "lucide-react";
 
 import { EnsoRing } from "@/components/mission/EnsoRing";
 import { InkArt } from "@/components/mission/InkArt";
@@ -9,7 +9,14 @@ import { Panel, PanelLabel } from "@/components/mission/Panel";
 import { SealStamp } from "@/components/mission/SealStamp";
 import { SeriesTracker } from "@/components/mission/SeriesTracker";
 import { StatTile } from "@/components/mission/StatTile";
-import { EnsoIcon, FlameIcon, HourglassIcon, ToriiIcon } from "@/components/mission/JapaneseIcons";
+import {
+  EnsoIcon,
+  FlameIcon,
+  HourglassIcon,
+  KabutoIcon,
+  TeaIcon,
+  ToriiIcon,
+} from "@/components/mission/JapaneseIcons";
 import {
   eventsOfKind,
   eventsOn,
@@ -379,7 +386,7 @@ function FocusPage() {
               : "border-border/60 bg-surface/40 text-muted-foreground hover:border-gold/40"
           }`}
         >
-          <ShieldCheck className="size-3.5" aria-hidden />
+          <KabutoIcon className="size-3.5" aria-hidden />
           {shield
             ? distraction.breaks === 0
               ? "Shield on · unbroken"
@@ -601,7 +608,7 @@ function FocusPage() {
                     key={entry.ref}
                     className="flex items-center gap-3 rounded-lg border border-border/40 bg-background/25 px-3 py-2.5"
                   >
-                    <Coffee className="size-3.5 shrink-0 text-gold-dim" aria-hidden />
+                    <TeaIcon className="size-3.5 shrink-0 text-gold-dim" aria-hidden />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[0.7rem] font-medium text-foreground">
                         {entry.label}

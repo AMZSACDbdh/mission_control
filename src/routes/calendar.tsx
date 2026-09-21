@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, Clock3 } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { ClockIcon } from "@/components/mission/JapaneseIcons";
 import { InkArt } from "@/components/mission/InkArt";
 import { PageHeader } from "@/components/mission/PageHeader";
 import { Panel, PanelLabel } from "@/components/mission/Panel";
@@ -321,7 +322,7 @@ function CalendarPage() {
                       </span>
                     </span>
                     <span className="flex shrink-0 items-center gap-1 text-[0.58rem] tabular-nums text-muted-foreground">
-                      <Clock3 className="size-3" aria-hidden />
+                      <ClockIcon className="size-3" aria-hidden />
                       {event.time ?? "—"}
                     </span>
                   </li>

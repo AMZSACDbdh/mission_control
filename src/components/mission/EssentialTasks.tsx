@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Check, ChevronDown, GripVertical, Info } from "lucide-react";
+import { ChevronDown, GripVertical, Info } from "lucide-react";
+import { CheckIcon } from "./JapaneseIcons";
 
 import { Panel, SectionLabel } from "./Panel";
 import { ProgressBar } from "./ProgressBar";
@@ -189,7 +190,7 @@ export function EssentialTasks({
                     )}
                   >
                     {complete ? (
-                      <Check className="size-4" aria-hidden />
+                      <CheckIcon className="size-4" aria-hidden />
                     ) : (
                       <ChevronDown
                         className={cn(
@@ -224,7 +225,7 @@ export function EssentialTasks({
                               )}
                               aria-hidden
                             >
-                              <Check className="size-2.5 stroke-[3]" />
+                              <CheckIcon className="size-3" />
                             </span>
                             <span
                               className={cn(

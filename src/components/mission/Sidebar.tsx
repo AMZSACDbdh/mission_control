@@ -1,40 +1,44 @@
+import type { ComponentType } from "react";
 import { Link } from "@tanstack/react-router";
-import {
-  Home,
-  Timer,
-  Swords,
-  Repeat,
-  BookOpen,
-  Dumbbell,
-  FolderKanban,
-  CalendarDays,
-  NotebookPen,
-  Settings,
-  Trophy,
-  Sparkles,
-  type LucideIcon,
-} from "lucide-react";
 
 import { InkArt } from "./InkArt";
 import { LotusMark } from "./LotusMark";
+import {
+  BambooIcon,
+  BookIcon,
+  BrushIcon,
+  HomeIcon,
+  HourglassIcon,
+  KanbanIcon,
+  KoyomiIcon,
+  PagodaIcon,
+  RidgeIcon,
+  StoneIcon,
+  SwordsIcon,
+  WheelIcon,
+} from "./JapaneseIcons";
 import { useActivity } from "@/hooks/use-activity";
 import { useProgression } from "@/hooks/use-progression";
 
-type NavItem = { label: string; to: string; icon: LucideIcon };
+type NavItem = {
+  label: string;
+  to: string;
+  icon: ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+};
 
 const navItems: NavItem[] = [
-  { label: "Home", to: "/", icon: Home },
-  { label: "Focus", to: "/focus", icon: Timer },
-  { label: "Missions", to: "/missions", icon: Swords },
-  { label: "Daily Disciplines", to: "/disciplines", icon: Repeat },
-  { label: "Academy", to: "/academy", icon: BookOpen },
-  { label: "Fitness", to: "/fitness", icon: Dumbbell },
-  { label: "Projects", to: "/projects", icon: FolderKanban },
-  { label: "Calendar", to: "/calendar", icon: CalendarDays },
-  { label: "Journal", to: "/journal", icon: NotebookPen },
-  { label: "Hall of Mastery", to: "/hall-of-mastery", icon: Trophy },
-  { label: "Insights", to: "/insights", icon: Sparkles },
-  { label: "Settings", to: "/settings", icon: Settings },
+  { label: "Home", to: "/", icon: HomeIcon },
+  { label: "Focus", to: "/focus", icon: HourglassIcon },
+  { label: "Missions", to: "/missions", icon: SwordsIcon },
+  { label: "Daily Disciplines", to: "/disciplines", icon: BambooIcon },
+  { label: "Academy", to: "/academy", icon: BookIcon },
+  { label: "Fitness", to: "/fitness", icon: StoneIcon },
+  { label: "Projects", to: "/projects", icon: KanbanIcon },
+  { label: "Calendar", to: "/calendar", icon: KoyomiIcon },
+  { label: "Journal", to: "/journal", icon: BrushIcon },
+  { label: "Hall of Mastery", to: "/hall-of-mastery", icon: PagodaIcon },
+  { label: "Insights", to: "/insights", icon: RidgeIcon },
+  { label: "Settings", to: "/settings", icon: WheelIcon },
 ];
 
 export function Sidebar() {

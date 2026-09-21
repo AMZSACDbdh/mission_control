@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { BookOpen, Compass, Heart, Sparkles, Plus, type LucideIcon } from "lucide-react";
+import { useState, type ComponentType } from "react";
+import { Plus } from "lucide-react";
 import { Mission, MissionCategory } from "@/data/missionsData";
+import { BookIcon, KanbanIcon, LotusIcon, StoneIcon } from "./JapaneseIcons";
 import { MissionCard } from "./MissionCard";
 
 interface MissionsBoardProps {
@@ -19,11 +20,13 @@ interface MissionsBoardProps {
 // Names must come from the MissionCategory union in `data/missionsData`. These
 // previously read "Academic", "Health" and "Growth" — labels from an earlier
 // draft of the board that no longer exist as categories.
-const CATEGORIES: { name: MissionCategory; label: string; icon: LucideIcon }[] = [
-  { name: "Study", label: "Study", icon: BookOpen },
-  { name: "Personal", label: "Personal", icon: Compass },
-  { name: "Fitness", label: "Fitness", icon: Heart },
-  { name: "Projects", label: "Projects", icon: Sparkles },
+type CategoryIcon = ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+
+const CATEGORIES: { name: MissionCategory; label: string; icon: CategoryIcon }[] = [
+  { name: "Study", label: "Study", icon: BookIcon },
+  { name: "Personal", label: "Personal", icon: LotusIcon },
+  { name: "Fitness", label: "Fitness", icon: StoneIcon },
+  { name: "Projects", label: "Projects", icon: KanbanIcon },
 ];
 
 export function MissionsBoard({

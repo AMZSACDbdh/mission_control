@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Check, CircleDot, GitBranch } from "lucide-react";
+import { CircleDot, GitBranch } from "lucide-react";
 
 import { EnsoRing } from "@/components/mission/EnsoRing";
 import { InkArt } from "@/components/mission/InkArt";
@@ -8,7 +8,13 @@ import { PageHeader } from "@/components/mission/PageHeader";
 import { Panel, PanelLabel } from "@/components/mission/Panel";
 import { SealStamp } from "@/components/mission/SealStamp";
 import { StatTile } from "@/components/mission/StatTile";
-import { FujiIcon, KamonIcon, ScrollIcon, ToriiIcon } from "@/components/mission/JapaneseIcons";
+import {
+  CheckIcon,
+  FujiIcon,
+  KamonIcon,
+  ScrollIcon,
+  ToriiIcon,
+} from "@/components/mission/JapaneseIcons";
 
 const title = "Projects — Mission Control";
 const description = "Build with intent. Ship with pride.";
@@ -335,7 +341,7 @@ function ProjectsPage() {
                       }`}
                       aria-hidden
                     >
-                      <Check className="size-2.5 stroke-[3]" />
+                      <CheckIcon className="size-3" />
                     </span>
                     <span
                       className={`text-[0.7rem] ${
